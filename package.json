@@ -1,0 +1,33 @@
+{
+  "name": "StackOverflow-lite",
+  "version": "1.0.0",
+  "description": "A RESTFUL API for stackoverfloq",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha",
+    "start": "nodemon server.js"
+  },
+  "author": "Umar Yusuf",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "jwt-simple": "^0.5.1",
+    "morgan": "^1.9.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "pg": "^7.4.3",
+    "pg-promise": "^8.4.6"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^5.4.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.3",
+    "request": "^2.88.0"
+  }
+}
