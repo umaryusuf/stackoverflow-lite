@@ -1,6 +1,6 @@
-const db = require('../db');
+import db from '../db';
 
-const createUser = (name, email, password) => {
+export const createUser = (name, email, password) => {
   const query = `
     INSERT INTO users(name, email, password)
     VALUES($1, $2, $3) RETURNING *
@@ -8,4 +8,4 @@ const createUser = (name, email, password) => {
   return db.one(query, [name, email, password]);
 };
 
-module.exports = { createUser };
+export default { createUser };

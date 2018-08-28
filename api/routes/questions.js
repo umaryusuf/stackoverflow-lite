@@ -1,4 +1,5 @@
 const express = require('express');
+const db = require('../../db');
 
 const router = express.Router();
 
@@ -7,9 +8,15 @@ const router = express.Router();
  */
 // GET - gets all questions
 router.get('/', (req, res) => {
-  res.status(200).json({
-    message: 'all questions here',
-  });
+  const query = 'SELECT * FROM questions';
+  db.query(query)
+    .then((data) => {
+      console.log(data);
+      res.status(200).json({
+        message: 'all questions here',
+      });
+    })
+    .catch(err => console.log(err));
 });
 
 // GET - gets single question with question id

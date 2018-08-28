@@ -1,15 +1,15 @@
-const jwt = require('jwt-simple');
-const bcrypt = require('bcrypt-nodejs');
+import jwt from 'jwt-simple';
+import bcrypt from 'bcrypt-nodejs';
 
-const config = require('../config');
-const { createUser } = require('../actions/signUp');
+import config from '../config';
+import { createUser } from '../actions/signUp';
 
 const tokenForUser = (user) => {
   const timestamp = new Date().getTime();
   return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
 };
 
-const signin = (req, res, next) => {
+export const signin = (req, res, next) => {
   /**
    * users already have their email and pasword
    * we just need to give them a token
@@ -18,7 +18,7 @@ const signin = (req, res, next) => {
 };
 
 
-const signup = (req, res, next) => {
+export const signup = (req, res, next) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -51,4 +51,4 @@ const signup = (req, res, next) => {
   });
 };
 
-module.exports = { signin, signup };
+export default { signin, signup };

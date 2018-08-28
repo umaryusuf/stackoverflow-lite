@@ -1,9 +1,9 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const morgan = require('morgan');
+import express from 'express';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
 
 // require routes
-const router = require('./router');
+import router from './router';
 
 const app = express();
 
@@ -52,4 +52,4 @@ app.use((error, req, res, next) => {
   });
 });
 
-module.exports = app;
+export default app;

@@ -1,11 +1,13 @@
-const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
-const { ExtractJwt } = require('passport-jwt');
-const bcrypt = require('bcrypt-nodejs');
-const LocalStrategy = require('passport-local');
+import passport from 'passport';
+import {
+  Strategy,
+  ExtractJwt,
+} from 'passport-jwt';
+import bcrypt from 'bcrypt-nodejs';
+import LocalStrategy from 'passport-local';
 
-const config = require('../config');
-const { findUserById, verifyUser } = require('../actions/signIn');
+import config from '../config';
+import { findUserById, verifyUser } from '../actions/signIn';
 
 // create local strategy
 const localOptions = { usernameField: 'email' };
@@ -35,7 +37,7 @@ const jwtOptions = {
 };
 
 // create JWT strategy
-const jwtlogin = new JwtStrategy(jwtOptions, (payload, done) => findUserById(payload.sub)
+const jwtlogin = new Strategy(jwtOptions, (payload, done) => findUserById(payload.sub)
   .then((foundUser) => {
     if (foundUser) {
       return done(null, foundUser);

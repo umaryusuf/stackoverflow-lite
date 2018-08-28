@@ -1,14 +1,14 @@
-const express = require('express');
-const passport = require('passport');
-const Authentication = require('../../controllers/authentication');
+import express from 'express';
+import passport from 'passport';
+import { signup, signin } from '../../controllers/authentication';
 
 const router = express.Router();
 const requireSignIn = passport.authenticate('local', { session: false });
 
 // POST - sign up route
-router.post('/signup', Authentication.signup);
+router.post('/signup', signup);
 
 // POST - login route
-router.post('/login', requireSignIn, Authentication.signin);
+router.post('/login', requireSignIn, signin);
 
-module.exports = router;
+export default router;

@@ -1,13 +1,13 @@
-const passport = require('passport');
-const passportService = require('./services/passport');
+import passport from 'passport';
+import passportService from './services/passport';
+
+// importing our routes files
+import authRoutes from './api/routes/auth';
+import questionsRoutes from './api/routes/questions';
 
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-// importing our routes files
-const authRoutes = require('./api/routes/auth');
-const questionsRoutes = require('./api/routes/questions');
-
-module.exports = (app) => {
+const router = (app) => {
   app.use('/api/v1/auth', authRoutes);
   /**
    * passing requireAuth middleware
@@ -15,3 +15,5 @@ module.exports = (app) => {
   */
   app.use('/api/v1/questions', requireAuth, questionsRoutes);
 };
+
+export default router;
