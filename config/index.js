@@ -1,4 +1,6 @@
 // Holds application secrete and config
-module.exports = {
+const config = {
   secret: 'lahjdhjagcfghdjkasi65434',
 };
+
+export default config;

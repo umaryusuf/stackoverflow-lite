@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../../db');
+const { client } = require('../../db');
 
 const router = express.Router();
 
@@ -8,31 +8,73 @@ const router = express.Router();
  */
 // GET - gets all questions
 router.get('/', (req, res) => {
-  const query = 'SELECT * FROM questions';
-  db.query(query)
-    .then((data) => {
-      console.log(data);
+  const sql = 'SELECT * FROM questions';
+  client.query(sql)
+    .then((result) => {
       res.status(200).json({
-        message: 'all questions here',
+        questions: result.rows,
       });
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
 });
 
 // GET - gets single question with question id
 router.get('/:questionId', (req, res) => {
-  res.send({
-    message: `Single question here ${req.params.questionId}`,
-  });
+  const sql = 'SELECT * FROM questions WHERE id=$1';
+  client.query(sql, [req.params.questionId])
+    .then((result) => {
+      if (result.rowCount < 1) {
+        res.status(404).json({
+          error: `No question found with that id: ${req.params.questionId}`,
+        });
+      } else {
+        res.status(200).json({
+          question: result.rows[0],
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
 });
 
 // POST - post/create a new question
 router.post('/', (req, res) => {
-  res.send({ message: 'question created' });
+  const { userId, question } = req.body;
+  const sql = 'INSERT INTO questions(userId, question) VALUES($1, $2) RETURNING *';
+  client.query(sql, [userId, question])
+    .then((result) => {
+      res.status(200).json({
+        question: result.rows[0],
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
 });
 
 // DELETE - deletes a single question with question id
 router.delete('/:questionId', (req, res) => {
+  const sql = 'DELETE * FROM questions WHERE id=$1';
+  client.query(sql, [req.params.questionId])
+    .then(() => {
+      res.status(200).json({
+        message: 'Question deleted succesfully',
+      });
+    })
+    .catch((err) => {
+      res.status(404).json({
+        error: err,
+      });
+    });
   res.send({
     message: `Single question here ${req.params.questionId}`,
   });
@@ -41,18 +83,56 @@ router.delete('/:questionId', (req, res) => {
 /**
  * answer routes
  */
+// GET - gets all answers to a question
+router.get('/:questionId/answers', (req, res) => {
+  const { questionId } = req.params;
+  const sql = 'SELECT * FROM answers WHERE questionId=$1';
+  client.query(sql, [questionId])
+    .then((result) => {
+      res.status(200).json({
+        answers: result.rows,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
+});
+
 // POST - post/create a new answer to a question
 router.post('/:questionId/answers', (req, res) => {
-  res.send({
-    message: 'question created',
-  });
+  const { questionId } = req.params;
+  const { userId, answer } = req.body;
+  const sql = 'INSERT INTO answers(questionId, userId, answer) VALUES($1, $2, $3) RETURNING *';
+  client.query(sql, [questionId, userId, answer])
+    .then((result) => {
+      res.status(200).json({
+        answer: result.rows[0],
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
 });
 
 // PUT - mark an answer as accepted to a question
-router.post('/:questionId/answers/answerId', (req, res) => {
-  res.send({
-    message: 'question created',
-  });
+router.put('/:questionId/answers/answerId', (req, res) => {
+  const { questionId, answerId } = req.params;
+  const sql = 'UPDATE answers SET prefered=1 WHERE id=$1 AND questionId=$2';
+  client.query(sql, [answerId, questionId])
+    .then((result) => {
+      res.status(200).json({
+        answer: result.rows[0],
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err.stack,
+      });
+    });
 });
 
-module.exports = router;
+export default router;

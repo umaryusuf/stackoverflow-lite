@@ -1,16 +1,16 @@
 import jwt from 'jwt-simple';
 import bcrypt from 'bcrypt-nodejs';
+import { client } from '../db';
 
 import config from '../config';
-import { createUser } from '../actions/signUp';
 
 const tokenForUser = (user) => {
   const timestamp = new Date().getTime();
   return jwt.encode({ sub: user.id, iat: timestamp }, config.secret);
 };
 
-export const signin = (req, res, next) => {
-  /**
+export const signin = (req, res) => {
+  /*
    * users already have their email and pasword
    * we just need to give them a token
    */
@@ -25,28 +25,39 @@ export const signup = (req, res, next) => {
     res.status(422).json({ error: 'You must provide a name, email and password' });
   }
 
-  // generate salt for password
-  bcrypt.genSalt(10, (err, salt) => {
+  // check if a user exist in the database
+  const query = 'SELECT * FROM users WHERE email=$1';
+  client.query(query, [email], (err, existingUser) => {
     if (err) {
       return next(err);
     }
 
-    // hash password
-    bcrypt.hash(password, salt, null, (error, hash) => {
-      if (error) {
-        return next(err);
+    if (existingUser.rowCount > 0) {
+      return res.status(422).json({ error: 'email is in use' });
+    }
+
+    // generate salt for password
+    bcrypt.genSalt(10, (error, salt) => {
+      if (err) {
+        return next(error);
       }
-      createUser(name, email, hash)
-        .then((newUser) => {
+
+      // hash password
+      bcrypt.hash(password, salt, null, (hashError, hash) => {
+        if (hashError) {
+          return next(hashError);
+        }
+        // create a new user
+        const sql = 'INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING * ';
+        client.query(sql, [name, email, hash], (insertError, newUser) => {
+          if (insertError) {
+            return next(insertError);
+          }
           res.json({
-            token: tokenForUser(newUser),
-          });
-        })
-        .catch(() => {
-          res.json({
-            error: 'Error saving a user to the database',
+            token: tokenForUser(newUser.rows[0]),
           });
         });
+      });
     });
   });
 };
