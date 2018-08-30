@@ -118,14 +118,14 @@ router.post('/:questionId/answers', (req, res) => {
     });
 });
 
-// PUT - mark an answer as accepted to a question
-router.put('/:questionId/answers/answerId', (req, res) => {
+// PATCH - mark an answer as accepted to a question
+router.patch('/:questionId/answers/:answerId', (req, res) => {
   const { questionId, answerId } = req.params;
   const sql = 'UPDATE answers SET prefered=1 WHERE id=$1 AND questionId=$2';
   client.query(sql, [answerId, questionId])
     .then((result) => {
       res.status(200).json({
-        answer: result.rows[0],
+        message: 'answer updated sucessfully',
       });
     })
     .catch((err) => {
